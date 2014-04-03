@@ -19,8 +19,8 @@ cd "$(dirname $SELF)"
 echo "-----> Installing SSH public keys..."
 cat $PUBLIC_KEY | ssh -o "StrictHostKeyChecking=no" -i ~/.vagrant.d/insecure_private_key vagrant@dokku.me "sudo sshcommand acl-add dokku test"
 
-for app_path in apps/*; do
+for app_path in tests/apps/*; do
   app=$(basename $app_path)
   echo "-----> Running test deploy of $app..."
-  ./test_deploy $app_path dokku.me $FORWARDED_PORT
+  ./tests/test_deploy $app dokku.me $FORWARDED_PORT
 done

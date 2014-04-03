@@ -8,9 +8,11 @@ if [[ -f "$DOKKU_ROOT/VHOST" ]]; then
   VHOST=$(< "$DOKKU_ROOT/VHOST")
   SUBDOMAIN=${APP/%\.${VHOST}/}
   if [[ "$APP" == *.* ]] && [[ "$SUBDOMAIN" == "$APP" ]]; then
+    location="/"
     hostname="${APP/\//-}"
   else
-    hostname="${APP/\//-}.$VHOST"
+    hostname="$VHOST/${APP/\//-}"
+    location="/${APP/\//-}"
   fi
 
   if [[ -e "$SSL/server.crt" ]] && [[ -e "$SSL/server.key" ]]; then
@@ -29,23 +31,8 @@ EOF
   if [[ -n "$SSL_INUSE" ]]; then
   cat<<EOF > $DOKKU_ROOT/$APP/nginx.conf
 upstream $APP { server 127.0.0.1:$PORT; }
-server {
-  listen      [::]:80;
-  listen      80;
-  server_name $hostname;
-  return 301 https://\$host\$request_uri;
-}
 
-server {
-  listen      [::]:443 ssl spdy;
-  listen      443 ssl spdy;
-  server_name $hostname;
-$SSL_DIRECTIVES
-
-  keepalive_timeout   70;
-  add_header          Alternate-Protocol  443:npn-spdy/2;
-
-  location    / {
+  location    $location {
     proxy_pass  http://$APP;
     proxy_http_version 1.1;
     proxy_set_header Upgrade \$http_upgrade;
@@ -56,7 +43,7 @@ $SSL_DIRECTIVES
     proxy_set_header X-Forwarded-Port \$server_port;
     proxy_set_header X-Request-Start \$msec;
   }
-}
+
 EOF
 
   echo "https://$hostname" > "$DOKKU_ROOT/$APP/URL"
@@ -64,11 +51,7 @@ else
 # default nginx.conf
   cat<<EOF > $DOKKU_ROOT/$APP/nginx.conf
 upstream $APP { server 127.0.0.1:$PORT; }
-server {
-  listen      [::]:80;
-  listen      80;
-  server_name $hostname;
-  location    / {
+  location    $location {
     proxy_pass  http://$APP;
     proxy_http_version 1.1;
     proxy_set_header Upgrade \$http_upgrade;
@@ -79,7 +62,6 @@ server {
     proxy_set_header X-Forwarded-Port \$server_port;
     proxy_set_header X-Request-Start \$msec;
   }
-}
 EOF
 
   echo "http://$hostname" > "$DOKKU_ROOT/$APP/URL"

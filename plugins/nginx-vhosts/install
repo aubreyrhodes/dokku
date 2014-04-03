@@ -15,7 +15,16 @@ if ! grep -q dokku-nginx-reload "/etc/sudoers"; then
 fi
 
 cat<<EOF > /etc/nginx/conf.d/dokku.conf
-include $DOKKU_ROOT/*/nginx.conf;
+
+server{
+
+  listen [::]:80;
+  listen 80;
+  servername $(< "$DOKKU_ROOT/VHOST")
+
+  include $DOKKU_ROOT/*/nginx.conf;
+
+}
 
 ssl_session_cache shared:SSL:20m;
 ssl_session_timeout 10m;
