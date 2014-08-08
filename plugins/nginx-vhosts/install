@@ -16,13 +16,15 @@ fi
 
 cat<<EOF > /etc/nginx/conf.d/dokku.conf
 
+include $DOKKU_ROOT/*/nginx_upstream.conf;
+
 server{
 
   listen [::]:80;
   listen 80;
   server_name $(< "$DOKKU_ROOT/VHOST");
 
-  include $DOKKU_ROOT/*/nginx.conf;
+  include $DOKKU_ROOT/*/nginx_location.conf;
 
 }
 
