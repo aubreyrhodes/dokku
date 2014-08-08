@@ -20,7 +20,7 @@ server{
 
   listen [::]:80;
   listen 80;
-  servername $(< "$DOKKU_ROOT/VHOST")
+  server_name $(< "$DOKKU_ROOT/VHOST")
 
   include $DOKKU_ROOT/*/nginx.conf;
 
