@@ -16,7 +16,7 @@ if [[ -f "$DOKKU_ROOT/VHOST" ]]; then
   cat<<EOF > $DOKKU_ROOT/$APP/nginx_location.conf
 
   location    $location {
-    proxy_pass  http://$APP;
+    proxy_pass  http://$APP/;
     proxy_http_version 1.1;
     proxy_set_header Upgrade \$http_upgrade;
     proxy_set_header Connection "upgrade";
