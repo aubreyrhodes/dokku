@@ -29,7 +29,7 @@ server{
 
 server{
   server_name www.$(< "$DOKKU_ROOT/VHOST");
-  rewrite ^(.*) http://$(< "$DOKKU_ROOT/VHOST")\$1 permanent;
+  return 301 http://$(< "$DOKKU_ROOT/VHOST")\$request_uri;
 }
 
 ssl_session_cache shared:SSL:20m;
