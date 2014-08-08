@@ -25,7 +25,11 @@ server{
   server_name $(< "$DOKKU_ROOT/VHOST");
 
   include $DOKKU_ROOT/*/nginx_location.conf;
+}
 
+server{
+  server_name www.$(< "$DOKKU_ROOT/VHOST");
+  rewrite ^(.*) http://$(< "$DOKKU_ROOT/VHOST")$1 permanent;
 }
 
 ssl_session_cache shared:SSL:20m;
